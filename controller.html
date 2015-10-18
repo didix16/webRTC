@@ -1,0 +1,104 @@
+<html>
+	<head>
+		<title> Chat Node.js</title>
+		<script src="/socket.io/socket.io.js"></script>
+		<script src="http://code.jquery.com/jquery-2.1.4.min.js"></script>
+		<script>
+			var GLOBALS = {};
+			var socket = io();
+			
+			GLOBALS.controls = {
+				moveUp: function(){
+					socket.emit('moveUp',{element: 'div.ball',isController:true});
+				},
+				moveDown: function(){
+					socket.emit('moveDown',{element: 'div.ball',isController:true});
+				},
+				moveLeft: function(){
+					socket.emit('moveLeft',{element: 'div.ball',isController:true});
+				},
+				moveRight: function(){
+					socket.emit('moveRight',{element: 'div.ball',isController:true});
+				}
+			};
+
+			$ctrl = GLOBALS.controls;
+
+			$(function(){
+
+				$("#btn_up").on('click',function(){
+					$ctrl.moveUp();
+				});
+
+				$("#btn_down").on('click',function(){
+					$ctrl.moveDown();
+				});
+
+				$("#btn_left").on('click',function(){
+					$ctrl.moveLeft();
+				});
+
+				$("#btn_right").on('click',function(){
+					$ctrl.moveRight();
+				});
+
+			});
+
+			
+		</script>
+		<style type="text/css">
+
+			body{
+				margin: 0px;
+			}
+			button{
+				border-radius: 50%;
+				width: 100px;
+				height: 100px;
+				font-size: 50px;
+			}
+
+			button[id='btn_left']{
+				transform: translate(0px,100px);
+			}
+			button[id='btn_down']{
+				transform: translate(-105px,200px);
+			}
+			button[id='btn_right']{
+				transform: translate(-100px,100px);
+			}
+
+			#controller{
+			    background-color: #6415C7;
+			    padding: 10px;
+			    position: relative;
+			    top: 0px;
+			    left: 0px;
+			    margin: 0px;
+			    height: 100%;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="controller">
+
+			<button id="btn_left" type="button">
+				&lt;
+			</button>
+
+			<button id="btn_up" type="button">
+				^
+			</button>
+
+			
+
+			<button id="btn_down" type="button">
+				v
+			</button>
+
+			<button id="btn_right" type="button">
+				&gt;
+			</button>
+		</div>
+	</body>
+</html>

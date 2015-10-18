@@ -1,0 +1,296 @@
+<html>
+	<head>
+		<title> Chat Node.js</title>
+		<script src="/socket.io/socket.io.js"></script>
+		<script src="http://code.jquery.com/jquery-2.1.4.min.js"></script>
+		<script>
+			var GLOBALS = {};
+			var socket = io();
+			socket.on('chat_msg',function(msg){
+
+				
+				$('#chat').append('<div class="msg" style="width:100%">' + msg +'</div>');
+			});
+			//socket event to move the ball
+			socket
+			.on("moveUp",function(msg){
+				console.log("MVT_UP_EVT",msg);
+				if(msg.isController){
+					$ctr.moveUp($(msg.element));
+				}
+			})
+			.on("moveDown",function(msg){
+
+				if(msg.isController)
+					$ctr.moveDown($(msg.element));
+			})
+			.on("moveLeft",function(msg){
+
+				if(msg.isController)
+					$ctr.moveLeft($(msg.element));
+			})
+			.on("moveRight",function(msg){
+
+				if(msg.isController)
+					$ctr.moveRight($(msg.element));
+			});
+			//
+			socket.on('motion',function(msg){
+				console.log("MOTION_EVT",msg);
+			});
+
+			socket
+			.on('start_draw',function(msg){
+
+				console.log("START_DRAW_EVT",msg);
+				var $wb = GLOBALS.$canvas;
+				var X = msg.position.x - $('#'+msg.canvasId).offset().left;
+				var Y = msg.position.y - $('#'+msg.canvasId).offset().top;
+				$fns.setMousePosition({x:X,y:Y});
+				//$fns.setIsMouseDown(false);
+				$wb.moveTo(X,Y);
+				$wb.lineTo(X,Y);
+				$wb.stroke();
+
+			})
+			.on('move_draw',function(msg){
+
+				console.log("MOVE_DRAW_EVT",msg);
+				var $wb = GLOBALS.$canvas;
+				var X = msg.position.x - $('#'+msg.canvasId).offset().left;
+				var Y = msg.position.y - $('#'+msg.canvasId).offset().top;
+				$fns.setMousePosition({x:X,y:Y});
+				//$fns.setIsMouseDown(false);
+				$wb.lineTo(X,Y);
+				$wb.stroke();
+
+			})
+			.on('stop_draw',function(msg){
+
+				console.log("STOP_DRAW_EVT",msg);
+				var $wb = GLOBALS.$canvas;
+				var X = msg.position.x - $('#'+msg.canvasId).offset().left;
+				var Y = msg.position.y - $('#'+msg.canvasId).offset().top;
+				$fns.setMousePosition({x:X,y:Y});
+				//$fns.setIsMouseDown(false);
+				$wb.lineTo(X,Y);
+				$wb.stroke();
+			});
+			
+			$(function(){
+
+				function _motion(e){
+					console.log(e);
+					var oEvent = {
+						acceleration : { // m/s²
+							x: e.acceleration.x,
+							y: e.acceleration.y,
+							z: e.acceleration.z
+						},
+						accelerationIncludingGravity: { //aceleración de dispositivo + gravedad m/s²
+							x: e.accelerationIncludingGravity.x,
+							y: e.accelerationIncludingGravity.y,
+							z: e.accelerationIncludingGravity.z
+						},
+						rotationRate: {
+							alpha: e.rotationRate.alpha, //Z axis
+							beta: e.rotationRate.beta,	 //X axis
+							gamma: e.rotationRate.gamma	 //Y axis
+						},
+						interval: e.interval
+					};
+					socket.emit("motion", oEvent);
+				}
+				if(window.DeviceMotionEvent){
+					window.addEventListener('devicemotion',_motion,true);
+				}
+				GLOBALS = {
+					isMouseDown : false,
+					status: 'idle', //indica si se está dibujando o no. Por ahora: idle o drawing
+					$that : this,
+					$canvas: $('#whiteboard').get(0).getContext("2d"),
+					currPosition : { //oPosition: objeto que indica la posicion del raton (x,y)
+						x: 0,
+						y: 0
+					},
+					functions: {
+						getIsMouseDown : function(){
+							return GLOBALS.isMouseDown;
+						},
+						setIsMouseDown: function(flag){
+							flag = typeof flag !== "undefined" ? flag : false;
+							GLOBALS.isMouseDown = flag;
+							return GLOBALS;
+						},
+						getMousePosition: function(){
+
+							return GLOBALS.currPosition;
+						},
+						setMousePosition: function(oPos){
+
+							GLOBALS.currPosition = oPos;
+							return GLOBALS;
+						},
+					},
+					controls: {
+						moveUp: function(obj){
+
+							var y = obj.offset().top;
+							console.log(y);
+							obj.css("top",parseInt(y-100)+"px");
+						},
+						moveDown: function(obj){
+							var y = obj.offset().top;
+							obj.css("top",parseInt(y+100)+"px");
+						},
+						moveLeft: function(obj){
+							var x = obj.offset().left;
+							obj.css("left",parseInt(x-100)+"px");
+						},
+						moveRight: function(obj){
+							var x = obj.offset().left;
+							obj.css("left",parseInt(x+100)+"px");
+						}
+					}
+				};
+
+				$fns = GLOBALS.functions;
+				$ctr = GLOBALS.controls;
+
+				$('#btn-send').on('click',function(e){
+					socket.emit('chat_msg',$('#chat_send').val());
+					$('#chat_send').val('');
+				});
+
+				$('#whiteboard')
+				.on('dragstart',function(e){
+					e.preventDefault();
+					return false;
+				})
+				.on('mousedown touchtstart',function(e){
+
+					var cId = $(this).attr('id');
+					var $wb = GLOBALS.$canvas;
+					var X = e.clientX - $(this).offset().left;
+					var Y = e.clientY - $(this).offset().top;
+					$fns.setMousePosition({x:X,y:Y});
+					$fns.setIsMouseDown(true);
+					$wb.beginPath();
+					$wb.moveTo(X,Y);
+
+					//Send to server
+					var oDraw = {
+						position: {
+							x : X,
+							y : Y
+						},
+						color: '#000',
+						canvasId: cId,
+						eventType: e.type
+					};
+					socket.emit('start_draw',oDraw);
+
+				})
+				.on('mousemove touchmove',function(e){
+
+					var cId = $(this).attr('id');
+					console.log(e);
+					if($fns.getIsMouseDown()){
+						var X;
+						var Y;
+						if(e.type === "mousemove"){
+							X = e.clientX - $(this).offset().left;
+							Y = e.clientY - $(this).offset().top;
+						}else{
+							var ev = e.originalEvent;
+							var touches = ev.touches;
+
+							//get first touch
+							X = touches[0].clientX - $(this).offset().left;
+							Y = touches[0].clientY - $(this).offset().top;
+						}
+							
+						console.log("POS:",{x:X,y:Y});
+						var $wb = GLOBALS.$canvas;
+						$fns.setMousePosition({x:X,y:Y});
+						$wb.lineTo(X,Y);
+						$wb.stroke();
+
+						//Send to server
+						var oDraw = {
+							position: {
+								x : X,
+								y : Y
+							},
+							color: '#000',
+							canvasId: cId,
+							eventType: e.type
+						};
+						socket.emit('move_draw',oDraw);
+					}
+
+				})
+				.on('mouseup touchend',function(e){
+
+					if($fns.getIsMouseDown()){
+						var cId = $(this).attr('id');
+						var X = e.clientX - $(this).offset().left;
+						var Y = e.clientY - $(this).offset().top;
+						var $wb = GLOBALS.$canvas;
+						$fns.setMousePosition({x:X,y:Y});
+						$fns.setIsMouseDown(false);
+						$wb.lineTo(X,Y);
+						$wb.stroke();
+
+						//Send to server
+						var oDraw = {
+							position: {
+								x : X,
+								y : Y
+							},
+							color: '#000',
+							canvasId: cId,
+							eventType: e.type
+						};
+						socket.emit('stop_draw',oDraw);
+					}
+					
+
+				});
+
+
+
+
+			});
+			
+		</script>
+		<style type="text/css">
+			#whiteboard{
+				border: #000 1px solid;
+			}
+			.ball{
+				border-radius: 50%;
+				width: 90px;
+				height: 90px;
+				display: block;
+				position: absolute;
+				background-color: #00ff00;
+				transition: left 1s, top 1s;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="chat">
+			
+		</div>
+		<canvas width="900px" height="400px" style="width:900px;height:400px" id="whiteboard" >
+			
+		</canvas>
+		<div>
+			<input type="text" id="chat_send" name="chat_send">
+			<button type="button" id="btn-send">Send</button>
+		</div>
+		<div class="ball">
+		</div>
+	</body>
+</html>
