@@ -16,11 +16,11 @@ with nodejs to response the realtime events.
 
 How it works?
 
-1) Initialize the server:
-/home/user$ node index.js
-2) Open main game:
-Access to http://server_name:3000
-3) Obtain the controller
+1) Initialize the server:<br>
+/home/user$ node index.js<br>
+2) Open main game:<br>
+Access to http://server_name:3000<br>
+3) Obtain the controller<br>
 Access with some device to http://server_name:3000/controller
 
 Have fun!
