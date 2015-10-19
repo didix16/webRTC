@@ -1,6 +1,8 @@
 <html>
 	<head>
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
 		<title> Chat Node.js</title>
+		<link rel="stylesheet" href="font-awesome/css/font-awesome.min.css">
 		<script src="/socket.io/socket.io.js"></script>
 		<script src="http://code.jquery.com/jquery-2.1.4.min.js"></script>
 		<script>
@@ -26,19 +28,22 @@
 
 			$(function(){
 
-				$("#btn_up").on('click',function(){
+				var clickEvnt = 'ontouchstart' in window ? 'touchend' : 'click';
+
+
+				$("#btn_up").on(clickEvnt,function(){
 					$ctrl.moveUp();
 				});
 
-				$("#btn_down").on('click',function(){
+				$("#btn_down").on(clickEvnt,function(){
 					$ctrl.moveDown();
 				});
 
-				$("#btn_left").on('click',function(){
+				$("#btn_left").on(clickEvnt,function(){
 					$ctrl.moveLeft();
 				});
 
-				$("#btn_right").on('click',function(){
+				$("#btn_right").on(clickEvnt,function(){
 					$ctrl.moveRight();
 				});
 
@@ -83,21 +88,21 @@
 		<div id="controller">
 
 			<button id="btn_left" type="button">
-				&lt;
+				<i class="fa fa-arrow-left"></i>
 			</button>
 
 			<button id="btn_up" type="button">
-				^
+				<i class="fa fa-arrow-up"></i>
 			</button>
 
 			
 
 			<button id="btn_down" type="button">
-				v
+				<i class="fa fa-arrow-down"></i>
 			</button>
 
 			<button id="btn_right" type="button">
-				&gt;
+				<i class="fa fa-arrow-right"></i>
 			</button>
 		</div>
 	</body>

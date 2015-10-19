@@ -1,12 +1,19 @@
 var app = require('express')();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
+
+var fileHandler = require('filehandler');
+var serveStatic = require('serve-static');
+
+var serve = serveStatic("./");
 app.get('/',function(req,res){
 	res.sendFile(__dirname + '/index.html');
 });
 app.get('/controller',function(req,res){
 	res.sendFile(__dirname + '/controller.html');
-})
+});
+app.use(serveStatic("./"));
+
 
 io.on('connection',function(socket){
 	console.log('user connected!');
