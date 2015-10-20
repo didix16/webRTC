@@ -131,7 +131,21 @@
 							GLOBALS.currPosition = oPos;
 							return GLOBALS;
 						},
+						setPlayer: function(n,oPlayer){
+
+							GLOBALS.players[n] = oPlayer;
+						},
+						getPlayer: function(num){
+
+							return GLOBALS.players[num];
+						}
 					},
+					players: {
+						0: null,
+						1: null,
+						2: null,
+						3: null
+					}
 					controls: {
 						moveUp: function(obj){
 
@@ -154,8 +168,9 @@
 					}
 				};
 
-				$fns = GLOBALS.functions;
-				$ctr = GLOBALS.controls;
+				$fns 	= GLOBALS.functions;
+				$ctr 	= GLOBALS.controls;
+				$plyers = GLOBALS.players;
 
 				$('#btn-send').on('click',function(e){
 					socket.emit('chat_msg',$('#chat_send').val());
