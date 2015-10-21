@@ -6,27 +6,58 @@
 		<script src="/socket.io/socket.io.js"></script>
 		<script src="http://code.jquery.com/jquery-2.1.4.min.js"></script>
 		<script>
-			var GLOBALS = {};
+			var GLOBALS = {
+				player: null
+			};
 			var socket = io();
+
+			GLOBALS.functions = {
+
+				setPlayer: function(player){
+
+					GLOBALS.player = player;
+				},
+				getPlayer: function(){
+
+					return GLOBALS.player;
+				},
+				getPlayerByUrl: function(){
+
+					var oVars = {};
+					var vars = window.location.search.replace("?","").split("&");
+
+					$.each(vars,function(k,v){
+
+						var pair = v.split("=");
+						oVars[pair[0]] = pair[1];
+					});
+
+					$fns.setPlayer(parseInt(oVars.player));
+				}
+			};
 			
 			GLOBALS.controls = {
 				moveUp: function(){
-					socket.emit('moveUp',{element: 'div.ball',isController:true});
+					socket.emit('moveUp',{element: '#ball_p-'+$fns.getPlayer(),isController:true, player:$fns.getPlayer()});
 				},
 				moveDown: function(){
-					socket.emit('moveDown',{element: 'div.ball',isController:true});
+					socket.emit('moveDown',{element: '#ball_p-'+$fns.getPlayer(),isController:true, player:$fns.getPlayer()});
 				},
 				moveLeft: function(){
-					socket.emit('moveLeft',{element: 'div.ball',isController:true});
+					socket.emit('moveLeft',{element: '#ball_p-'+$fns.getPlayer(),isController:true, player:$fns.getPlayer()});
 				},
 				moveRight: function(){
-					socket.emit('moveRight',{element: 'div.ball',isController:true});
+					socket.emit('moveRight',{element: '#ball_p-'+$fns.getPlayer(),isController:true, player:$fns.getPlayer()});
 				}
 			};
 
+			$fns = GLOBALS.functions;
 			$ctrl = GLOBALS.controls;
 
 			$(function(){
+
+				//Get the player!
+				$fns.getPlayerByUrl();
 
 				var clickEvnt = 'ontouchstart' in window ? 'touchend' : 'click';
 

@@ -2,10 +2,15 @@
 	<head>
 		<title> Chat Node.js</title>
 		<script src="/socket.io/socket.io.js"></script>
+		<script src="/qrcode.js/qrcode.min.js"></script>
+		<script src="/player.class.js"></script>
 		<script src="http://code.jquery.com/jquery-2.1.4.min.js"></script>
 		<script>
 			var GLOBALS = {};
 			var socket = io();
+
+			var p1 = new Player({name: "Didac",num:0, position: {x:0,y:0} });
+			var p2 = new Player({name: "Eva",num:1, position: {x:0,y:0} });
 			socket.on('chat_msg',function(msg){
 
 				
@@ -114,6 +119,54 @@
 						y: 0
 					},
 					functions: {
+
+
+						genQRCodePlayer: function(){
+
+							var firstSlotFound = false;
+							var playerSlot = 0;
+							$.each(GLOBALS.players,function(k,v){
+
+								if(v === null && !firstSlotFound){
+									playerSlot = k;
+									firstSlotFound = true;
+								}
+							});
+
+							var qrUrl = $fns.getUrlBase()+"/controller?player="+playerSlot;
+							var qrcode = new QRCode(
+								'player-qr',
+								{
+									text: qrUrl,
+									width: 128,
+									height: 128,
+									colorDark: '#000000',
+									colorLight: '#FFFFFF',
+									correctLevel: QRCode.CorrectLevel.H
+								}
+							);
+						},
+						getUrlBase: function(){
+
+							if(!window.location.origin){
+								window.location.origin = window.location.protocol + "//" +window.location.hostname + (window.location.port ? ':' +window.location.port : '');
+							}
+
+							return window.location.origin;
+						},
+						spawnBallByPlayer: function(oPlayer){
+
+							var bId = oPlayer.getNum();
+							var colLetters = "0123456789ABCDEF";
+							var color = "#";
+							for(var i= 0; i< 6; i++){
+								color += colLetters[Math.floor(Math.random() * 16)];
+							}
+							 
+							
+							var ball = '<div id="ball_p-'+bId+'" style="background-color: '+color+'" class="ball">'+oPlayer.getName()+'</div>';
+							$('#ball-container').append(ball);
+						},
 						getIsMouseDown : function(){
 							return GLOBALS.isMouseDown;
 						},
@@ -131,21 +184,34 @@
 							GLOBALS.currPosition = oPos;
 							return GLOBALS;
 						},
-						setPlayer: function(n,oPlayer){
+						setPlayer: function(oPlayer){
 
-							GLOBALS.players[n] = oPlayer;
+							GLOBALS.players[oPlayer.getNum()] = oPlayer;
 						},
 						getPlayer: function(num){
 
 							return GLOBALS.players[num];
-						}
+						},
+						getConnectedPlayers: function(){
+
+							var len = Object.keys(GLOBALS.players).length;
+							var playersOn = [];
+							for(var i = 0;i< len;i++){
+
+								if(GLOBALS.players[i] !== null){
+									playersOn.push(GLOBALS.players[i]);
+								}
+							}
+
+							return playersOn;
+						},
 					},
 					players: {
 						0: null,
 						1: null,
 						2: null,
 						3: null
-					}
+					},
 					controls: {
 						moveUp: function(obj){
 
@@ -171,6 +237,12 @@
 				$fns 	= GLOBALS.functions;
 				$ctr 	= GLOBALS.controls;
 				$plyers = GLOBALS.players;
+
+				$fns.setPlayer(p1);
+				$fns.setPlayer(p2);
+
+				$fns.spawnBallByPlayer(p1);
+				$fns.spawnBallByPlayer(p2);
 
 				$('#btn-send').on('click',function(e){
 					socket.emit('chat_msg',$('#chat_send').val());
@@ -291,6 +363,8 @@
 				position: absolute;
 				background-color: #00ff00;
 				transition: left 1s, top 1s;
+				top: 50%;
+				left: 50%
 			}
 		</style>
 	</head>
@@ -305,7 +379,12 @@
 			<input type="text" id="chat_send" name="chat_send">
 			<button type="button" id="btn-send">Send</button>
 		</div>
-		<div class="ball">
+		<div id="ball-container">
+			<div class="ball">
+			</div>
+		</div>
+		
+		<div id="player-qr">
 		</div>
 	</body>
 </html>
