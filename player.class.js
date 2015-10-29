@@ -20,9 +20,11 @@ var Player = function(oOptions){
 	//Private constructor
 	function __construct(oOptions){
 
-		that.setName(oOptions.name);
+		that.setName(oOptions.name ? oOptions.name : "Player"+oOptions.num);
 		that.setNum(oOptions.num);
-		that.setPosition(oOptions.position);
+
+		//At the moment not used
+		//that.setPosition(oOptions.position);
 	};
 
 	//public functions

@@ -32,11 +32,40 @@
 						oVars[pair[0]] = pair[1];
 					});
 
-					$fns.setPlayer(parseInt(oVars.player));
+					$fns.setPlayer({num:parseInt(oVars.player)});
 				}
 			};
 			
 			GLOBALS.controls = {
+
+				moveUp: function(){
+					socket.emit('moveUp',
+						{
+							player:$fns.getPlayer()
+						}
+					);
+				},
+				moveDown: function(){
+
+				},
+				moveLeft: function(){
+
+				},
+				moveRight: function(){
+
+				},
+				btnA: function(){
+					socket.emit('btnA',
+						{
+							player:$fns.getPlayer()
+						}
+					);
+				},
+				btnB: function(){
+
+				}
+				//Old version
+				/*
 				moveUp: function(){
 					socket.emit('moveUp',{element: '#ball_p-'+$fns.getPlayer(),isController:true, player:$fns.getPlayer()});
 				},
@@ -48,7 +77,7 @@
 				},
 				moveRight: function(){
 					socket.emit('moveRight',{element: '#ball_p-'+$fns.getPlayer(),isController:true, player:$fns.getPlayer()});
-				}
+				}*/
 			};
 
 			$fns = GLOBALS.functions;
@@ -58,6 +87,7 @@
 
 				//Get the player!
 				$fns.getPlayerByUrl();
+				socket.emit('playerJoin',$fns.getPlayer());
 
 				var clickEvnt = 'ontouchstart' in window ? 'touchend' : 'click';
 
@@ -76,6 +106,14 @@
 
 				$("#btn_right").on(clickEvnt,function(){
 					$ctrl.moveRight();
+				});
+
+				$("#btn_a").on(clickEvnt,function(){
+					$ctrl.btnA();
+				});
+
+				$("#btn_b").on(clickEvnt,function(){
+					$ctrl.btnB();
 				});
 
 			});

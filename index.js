@@ -7,7 +7,7 @@ var serveStatic = require('serve-static');
 
 var serve = serveStatic("./");
 app.get('/',function(req,res){
-	res.sendFile(__dirname + '/index.html');
+	res.sendFile(__dirname + '/snackball.html');
 });
 app.get('/controller',function(req,res){
 	res.sendFile(__dirname + '/controller.html');
@@ -18,6 +18,12 @@ app.use(serveStatic("./"));
 io.on('connection',function(socket){
 	console.log('user connected!');
 	console.log(socket);
+
+	//Player
+	socket
+	.on("playerJoin",function(msg){
+		socket.broadcast.emit('playerJoin',msg);
+	});
 
 	//Controls
 	socket
@@ -33,6 +39,12 @@ io.on('connection',function(socket){
 	})
 	.on("moveRight",function(msg){
 		socket.broadcast.emit('moveRight',msg);
+	})
+	.on("btnA",function(msg){
+		socket.broadcast.emit('btnA',msg);
+	})
+	.on("btnB",function(msg){
+		socket.broadcast.emit('btnB',msg);
 	});
 	//
 

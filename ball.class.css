@@ -1,0 +1,13 @@
+.ball{
+	border-radius: 50%;
+	width: 90px;
+	height: 90px;
+	display: block;
+	position: absolute;
+	background-color: #00ff00;
+	-webkit-transform: rotate3d(0, 0, 1, 0deg);
+	-moz-transform: rotate3d(0, 0, 1, 0deg);
+	-ms-transform: rotate3d(0, 0, 1, 0deg);
+	-o-transform: rotate3d(0, 0, 1, 0deg);
+	transform: rotate3d(0, 0, 1, 0deg);
+}

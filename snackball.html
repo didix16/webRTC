@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>SnackBall</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0"/>
+		<meta name="format-detection" content="telephone=no">
+		<!-- CSS development files -->
+		<link rel="stylesheet" href="game.core.css" />
+		<link rel="stylesheet" href="ball.class.css" />
+
+		<script src="/socket.io/socket.io.js"></script>
+		<script src="/qrcode.js/qrcode.min.js"></script>
+		<script src="/player.class.js"></script>
+		<script src="/ball.class.js"></script>
+		<script src="/game.core.js"></script>
+		<script src="http://code.jquery.com/jquery-2.1.4.min.js"></script>
+	</head>
+	<body>
+		<stage>
+		</stage>
+	</body>
+	<script>
+
+		(function(){
+
+			game.init(40);
+			
+		})();
+		</script>
+</html>
