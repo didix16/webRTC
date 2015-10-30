@@ -35,8 +35,8 @@ var Ball = function(oOptions){
 
 	this.setPosition = function(oPos){
 
-		vars.position.x = oPos.x;
-		vars.position.y = oPos.y;
+		vars.position.x = oPos.x - vars.radius;
+		vars.position.y = oPos.y - vars.radius;
 
 		return this;
 	};
@@ -44,6 +44,19 @@ var Ball = function(oOptions){
 	this.getPosition = function(){
 
 		return vars.position;
+	};
+
+	this.setPosition0 = function(oPos){
+
+		vars.position0.x = oPos.x;
+		vars.position0.y = oPos.y;
+
+		return this;
+	};
+
+	this.getPosition0 = function(){
+
+		return vars.position0;
 	};
 
 	this.setPropietary = function(oPlayer){
@@ -312,8 +325,19 @@ Ball.prototype.spawn = function(eContainer){
 	$bSt.width = (this.getRadius() * 2)+'px';
 	$bSt.height = (this.getRadius() * 2)+'px';
 	$bSt.backgroundColor = this.getColor();
-	$bSt.top = (this.getPosition().y - this.getRadius())+'px';
-	$bSt.left = (this.getPosition().x - this.getRadius())+'px';
+
+	var oPos = {x:0,y:0};
+
+	var x0 = this.getPosition().x;
+	var y0 = this.getPosition().y;
+
+	oPos.x = x0;
+	oPos.y = y0;
+
+	this.setPosition0(oPos);
+
+	$bSt.top = y0+'px';
+	$bSt.left = x0+'px';
 
 	this.setElement($eBall);
 
@@ -395,6 +419,17 @@ Ball.prototype.move = function(delta){
 		 	this.setVectorialSpeed(oNewSpeed);
 		}
 	}
+
+	var oNewPos = this.getPosition();
+
+	oNewPos.x = this.getVectorialSpeed().x * delta / 25 + this.getPosition0().x;
+	oNewPos.y = this.getVectorialSpeed().y * delta / 25 + this.getPosition0().y;
+
+	this.setPosition(oNewPos);
+
+	//Hit test here
+
+	this.setPosition0(oNewPos);
 
 	return this;
 
