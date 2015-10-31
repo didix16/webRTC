@@ -21,26 +21,56 @@ _w.game = {
 	controls: {
 
 		moveUp: function(obj){
-			var ball = game.balls[obj.player.num];
-			ball.setGas(1);
+			
 		},
 		moveDown: function(obj){
 			
 		},
 		moveLeft: function(obj){
 			
+			var ball = game.balls[obj.player.num];
+
+			if(obj.pressed && !ball.getTurn()){
+				ball.turnDirection('left');
+			}else if(!obj.pressed && ball.getTurn()){
+				ball.turnDirection('forward');
+			}
 		},
 		moveRight: function(obj){
-			
+
+			var ball = game.balls[obj.player.num];
+
+			if(obj.pressed && !ball.getTurn()){
+				ball.turnDirection('right');
+			}else if(!obj.pressed && ball.getTurn()){
+
+				ball.turnDirection('forward');
+			}
 		},
 		btnA: function(obj){
 
 			var ball = game.balls[obj.player.num];
 
-			ball.setColor(game.getRandomColor());
+			if(obj.pressed && !ball.getGas()){
+				ball.setGas(1);
+			}else if(!obj.pressed && ball.getGas()){
+				ball.setGas(0);
+			}
+
+			//ball.setColor(game.getRandomColor());
 		},
 		btnB: function(obj){
 
+			var ball = game.balls[obj.player.num];
+
+			if(obj.pressed && !ball.getGas()){
+
+				ball.setGas(-1);
+
+			}else if(!obj.pressed && ball.getGas()){
+				
+				ball.setGas(0);
+			}
 		}
 	},
 
@@ -91,9 +121,9 @@ _w.game = {
 
 		var ball = new Ball(oOptions);
 
-		ball.spawn(this.stage);
-
 		this.balls[oOptions.propietary.getNum()] = ball;
+
+		ball.spawn(this.stage);
 
 		console.info("GAME::Ball spawned at: {X:"+ball.getPosition().x+", Y:"+ball.getPosition().y+"}");
 
@@ -118,7 +148,7 @@ _w.game = {
 		var bLen = that.balls.length;
 		for(var i = 0;i<bLen;i++){
 
-			that.balls[i].move().draw();
+			that.balls[i].move(this.delta).draw();
 		}
 	},
 

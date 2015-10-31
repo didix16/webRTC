@@ -8,6 +8,8 @@
 		<!-- CSS development files -->
 		<link rel="stylesheet" href="game.core.css" />
 		<link rel="stylesheet" href="ball.class.css" />
+		<link rel="stylesheet" href="map.tileset.css" />
+		<link rel="stylesheet" href="font-awesome/css/font-awesome.min.css">
 
 		<script src="/socket.io/socket.io.js"></script>
 		<script src="/qrcode.js/qrcode.min.js"></script>
@@ -21,6 +23,36 @@
 		</stage>
 	</body>
 	<script>
+
+		var house = [
+			['house1-left-up-corner','house1-middle-up','house1-right-up-corner'],
+			['house1-left-middle-corner','house1-middle-middle-corner','house1-right-middle-corner'],
+			['house1-left-down-corner','house1-middle-down-corner','house1-right-down-corner'],
+			['house1-left-wall-corner','house1-middle-wall-corner','house1-right-wall-corner']
+		];
+		/*print map*/
+
+		var TILE_WITH = 16; //px square
+
+		var X_TILES = parseInt(window.innerWidth /TILE_WITH);
+		var Y_TILES = parseInt(window.innerHeight /TILE_WITH);
+
+		for(var i = 0;i< Y_TILES;i++){
+
+			hy = 0;
+			for(var j = 0; j< X_TILES;j++){
+
+				var h = 0;
+				if(j >= 5 && j<=7 && i>= 2 && i<=5){
+
+					$(document.body).append('<div class="map '+house[i-2][j-5]+'"></div>');
+				}else{
+					$(document.body).append('<div class="map grass"></div>');
+				}
+				
+			}
+		}
+
 
 		(function(){
 

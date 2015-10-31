@@ -38,31 +38,58 @@
 			
 			GLOBALS.controls = {
 
-				moveUp: function(){
+				moveUp: function(pressed){
 					socket.emit('moveUp',
 						{
-							player:$fns.getPlayer()
+							player:$fns.getPlayer(),
+							pressed: pressed
 						}
 					);
 				},
-				moveDown: function(){
+				moveDown: function(pressed){
+					socket.emit('moveDown',
+						{
+							player:$fns.getPlayer(),
+							pressed: pressed
+						}
+					);
+				},
+				moveLeft: function(pressed){
+
+					socket.emit('moveLeft',
+						{
+							player:$fns.getPlayer(),
+							pressed: pressed
+						}
+					);
+
 
 				},
-				moveLeft: function(){
+				moveRight: function(pressed){
 
+					socket.emit('moveRight',
+						{
+							player:$fns.getPlayer(),
+							pressed: pressed
+						}
+					);
 				},
-				moveRight: function(){
-
-				},
-				btnA: function(){
+				btnA: function(pressed){
 					socket.emit('btnA',
 						{
-							player:$fns.getPlayer()
+							player:$fns.getPlayer(),
+							pressed: pressed
 						}
 					);
 				},
-				btnB: function(){
+				btnB: function(pressed){
 
+					socket.emit('btnB',
+						{
+							player:$fns.getPlayer(),
+							pressed: pressed
+						}
+					);
 				}
 				//Old version
 				/*
@@ -89,31 +116,131 @@
 				$fns.getPlayerByUrl();
 				socket.emit('playerJoin',$fns.getPlayer());
 
-				var clickEvnt = 'ontouchstart' in window ? 'touchend' : 'click';
+				var clickEvnt = 'ontouchstart' in window ? 'touchstart' : 'mousedown';
+				var stopClick = 'ontouchend' in window ? 'touchend' : 'mouseup';
 
+				var aEvents = [clickEvnt,stopClick];
+				var sEvents = aEvents.join(" ");
 
-				$("#btn_up").on(clickEvnt,function(){
-					$ctrl.moveUp();
+				$("#btn_up").on(sEvents,function(e){
+
+					var pressed = false;
+
+					switch(e.type){
+
+						case 'touchstart':
+						case 'mousedown':
+							pressed = true;
+							break;
+						case 'touchend':
+						case 'mouseup':
+							pressed = false;
+							break;
+
+					}
+
+					$ctrl.moveUp(pressed);
+
 				});
 
-				$("#btn_down").on(clickEvnt,function(){
-					$ctrl.moveDown();
+				$("#btn_down").on(sEvents,function(e){
+
+					var pressed = false;
+
+					switch(e.type){
+
+						case 'touchstart':
+						case 'mousedown':
+							pressed = true;
+							break;
+						case 'touchend':
+						case 'mouseup':
+							pressed = false;
+							break;
+
+					}
+
+					$ctrl.moveDown(pressed);
 				});
 
-				$("#btn_left").on(clickEvnt,function(){
-					$ctrl.moveLeft();
+				$("#btn_left").on(sEvents,function(e){
+
+					var pressed = false;
+
+					switch(e.type){
+
+						case 'touchstart':
+						case 'mousedown':
+							pressed = true;
+							break;
+						case 'touchend':
+						case 'mouseup':
+							pressed = false;
+							break;
+
+					}
+
+					$ctrl.moveLeft(pressed);
 				});
 
-				$("#btn_right").on(clickEvnt,function(){
-					$ctrl.moveRight();
+				$("#btn_right").on(sEvents,function(e){
+
+					var pressed = false;
+
+					switch(e.type){
+
+						case 'touchstart':
+						case 'mousedown':
+							pressed = true;
+							break;
+						case 'touchend':
+						case 'mouseup':
+							pressed = false;
+							break;
+
+					}
+
+					$ctrl.moveRight(pressed);
 				});
 
-				$("#btn_a").on(clickEvnt,function(){
-					$ctrl.btnA();
+				$("#btn_a").on(sEvents,function(e){
+
+					var pressed = false;
+
+					switch(e.type){
+
+						case 'touchstart':
+						case 'mousedown':
+							pressed = true;
+							break;
+						case 'touchend':
+						case 'mouseup':
+							pressed = false;
+							break;
+
+					}
+
+					$ctrl.btnA(pressed);
 				});
 
-				$("#btn_b").on(clickEvnt,function(){
-					$ctrl.btnB();
+				$("#btn_b").on(sEvents,function(e){
+
+					var pressed = false;
+
+					switch(e.type){
+
+						case 'touchstart':
+						case 'mousedown':
+							pressed = true;
+							break;
+						case 'touchend':
+						case 'mouseup':
+							pressed = false;
+							break;
+
+					}
+
+					$ctrl.btnB(pressed);
 				});
 
 			});
@@ -127,27 +254,37 @@
 			}
 			button{
 				border-radius: 50%;
-				width: 100px;
-				height: 100px;
-				font-size: 50px;
+				width: 70px;
+				height: 70px;
+				font-size: 35px;
 			}
 
 			button[id='btn_left']{
-				transform: translate(0px,100px);
+				position: relative;
+				top: 100px;
 			}
 			button[id='btn_down']{
-				transform: translate(-105px,200px);
+
+				position: relative;
+				left: -105px;
+				top: 200px;
 			}
 			button[id='btn_right']{
-				transform: translate(-100px,100px);
+
+				position: relative;
+				top: 100px;
+				left: -100px;
 			}
 
 			button[id='btn_a']{
-				transform: translate(0px,60px);
+				position: relative;
+				top: 60px;
 			}
 
 			button[id='btn_b']{
-				transform: translate(0px,160px);
+
+				position: relative;
+				top: 160px;
 			}
 
 			#controller{

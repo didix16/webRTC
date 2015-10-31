@@ -35,8 +35,8 @@ var Ball = function(oOptions){
 
 	this.setPosition = function(oPos){
 
-		vars.position.x = oPos.x - vars.radius;
-		vars.position.y = oPos.y - vars.radius;
+		vars.position.x = oPos.x;
+		vars.position.y = oPos.y;
 
 		return this;
 	};
@@ -317,19 +317,22 @@ Ball.prototype.spawn = function(eContainer){
 
 		eContainer.appendChild(eBall);
 		$eBall = document.getElementById('ball-p-'+$p.getNum());	
-
+		$eBall.innerHTML = "<i class='fa fa-arrow-up'></i>";
 	}
 
 	$bSt = $eBall.style;
 
 	$bSt.width = (this.getRadius() * 2)+'px';
 	$bSt.height = (this.getRadius() * 2)+'px';
+
+	$bSt.marginTop = -this.getRadius()+'px';
+	$bSt.marginLeft = -this.getRadius()+'px';
 	$bSt.backgroundColor = this.getColor();
 
 	var oPos = {x:0,y:0};
 
-	var x0 = this.getPosition().x;
-	var y0 = this.getPosition().y;
+	var x0 = pos.x;
+	var y0 = pos.y;
 
 	oPos.x = x0;
 	oPos.y = y0;
@@ -353,14 +356,14 @@ Ball.prototype.draw = function(){
 	$bSt = this.getElement().style;
 
 	//Deberia restar el radio?...
-	$bSt.top = this.getPosition().y - this.getRadius();
-	$bSt.left = this.getPosition().x - this.getRadius();
+	$bSt.top = (this.getPosition().y)+'px';
+	$bSt.left = (this.getPosition().x)+'px';
 
 	$bSt.backgroundColor = this.getColor();
 
 	if(this.getAlpha()!==this.getAlpha0()){
 
-		$bSt.style.transform = 'rotate3d(0,0,1,'+this.getAlpha()+'deg)';
+		$bSt.transform = 'rotate3d(0,0,1,'+this.getAlpha()+'deg)';
 
 		this.setAlpha0(this.getAlpha());
 	}
@@ -374,26 +377,28 @@ Ball.prototype.move = function(delta){
 	var that = this;
 
 	//Check if is turning
-	if(this.turn){
-		this.alpha += 4*this.turn;
+	if(this.getTurn()){
+		this.setAlpha(this.getAlpha()+ 4*this.getTurn());
 
-		if(this.alpha >= 360){
-			this.alpha -= 360; 
-		}else if(this.alpha<0){
-			this.alpha += 360;
+		if(this.getAlpha() >= 360){
+			this.setAlpha(this.getAlpha()-360); 
+		}else if(this.getAlpha()<0){
+			this.setAlpha(this.getAlpha()+360);
 		}
 	}
 
 	//Get alpha in radians
-	var betaRad = (this.getAlpha()-90)*Math.PI/180;
+	var betaRad = (this.getAlpha()-90)*(Math.PI/180);
 
 	dir_x = Math.cos(betaRad);
 	dir_y = Math.sin(betaRad);
 	
 
 	//Friction
-	var oNewSpeed = null;
-	oNewSpeed = this.getVectorialSpeed();
+	var oNewSpeed = {x:0,y:0};
+
+	oNewSpeed.x = this.getVectorialSpeed().x;
+	oNewSpeed.y = this.getVectorialSpeed().y;
 
 	oNewSpeed.x *= this.getFriction();
 	oNewSpeed.y *= this.getFriction();
@@ -402,11 +407,15 @@ Ball.prototype.move = function(delta){
 	
 	
 	//Check if is accelerating
-	oNewSpeed = this.getVectorialSpeed();
+	oNewSpeed = {x:0,y:0};
+
+	oNewSpeed.x = this.getVectorialSpeed().x;
+	oNewSpeed.y = this.getVectorialSpeed().y;
 
 	if(this.getGas()===1){
-		oNewSpeed.x+=this.getAcceleration()/this.getFriction()/this.getFriction()*dir_x;
-		oNewSpeed.y+=this.getAcceleration()/this.getFriction()/this.getFriction()*dir_y;
+
+		oNewSpeed.x+= (this.getAcceleration() /** delta/25*/) / (this.getFriction() /** delta/25*/) /(this.getFriction()  /** delta/25*/) *dir_x;
+		oNewSpeed.y+= (this.getAcceleration() /** delta/25*/) / (this.getFriction() /** delta/25*/) /(this.getFriction()  /** delta/25*/) *dir_y;
 		this.setVectorialSpeed(oNewSpeed);
 		this.setSpeed(Math.sqrt(this.getSpeed().x*this.getSpeed().x + this.getSpeed().y*this.getSpeed().y));
 		if(this.getSpeed()>this.getMaxSpeed()) {
@@ -420,14 +429,54 @@ Ball.prototype.move = function(delta){
 		}
 	}
 
-	var oNewPos = this.getPosition();
+	var oNewPos = {x:0,y:0};
+	oNewPos.x = this.getPosition().x;
+	oNewPos.y = this.getPosition().y;
 
 	oNewPos.x = this.getVectorialSpeed().x * delta / 25 + this.getPosition0().x;
 	oNewPos.y = this.getVectorialSpeed().y * delta / 25 + this.getPosition0().y;
 
 	this.setPosition(oNewPos);
 
-	//Hit test here
+	var currPos = this.getPosition();
+	var currRadius = this.getRadius();
+
+	var newVectSpeed = {x:0,y:0};
+
+	newVectSpeed.x = this.getVectorialSpeed().x;
+	newVectSpeed.y = this.getVectorialSpeed().y;
+
+	//Bounds hit-test X
+	if((currPos.x) < currRadius){
+
+		oNewPos.x = currRadius;
+
+		newVectSpeed.x = -newVectSpeed.x;
+		this.setVectorialSpeed(newVectSpeed);
+//			this.speedy = this.speedy / 2;
+	}
+	else if((currPos.x) > (_w.innerWidth - currRadius)){
+		oNewPos.x = _w.innerWidth - currRadius;
+		newVectSpeed.x = -newVectSpeed.x;
+		this.setVectorialSpeed(newVectSpeed);
+//			this.speedy = this.speedy / 2;
+	}
+
+	//Bounds hit-test Y
+	if((currPos.y) < currRadius){
+
+		oNewPos.y = currPos.y;
+
+		newVectSpeed.y = -newVectSpeed.y;
+		this.setVectorialSpeed(newVectSpeed);
+//			this.speedy = this.speedy / 2;
+	}
+	else if((currPos.y) > (_w.innerHeight - currRadius)){
+		oNewPos.y = _w.innerHeight - currRadius;
+		newVectSpeed.y = -newVectSpeed.y;
+		this.setVectorialSpeed(newVectSpeed);
+//			this.speedy = this.speedy / 2;
+	}
 
 	this.setPosition0(oNewPos);
 

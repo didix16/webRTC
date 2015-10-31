@@ -1,0 +1,88 @@
+body{
+	 font-size: 0px;
+}
+.map{
+
+	background: url('map.png');
+	display: inline-block;
+	width: 16px;
+	height: 16px;
+}
+
+.map.grass{
+
+	background-position: -16px 1104px;
+
+}
+
+.map.house1-left-up-corner{
+
+	background-position: 0px 1088px;
+
+}
+
+.map.house1-middle-up{
+
+	background-position: -16px 1088px;
+
+}
+
+.map.house1-right-up-corner{
+
+	background-position: -32px 1088px;
+
+}
+
+.map.house1-left-middle-corner{
+
+	background-position: 0px 1072px;
+
+}
+
+.map.house1-middle-middle-corner{
+
+	background-position: -16px 1072px;
+
+}
+
+.map.house1-right-middle-corner{
+
+	background-position: -32px 1072px;
+
+}
+
+.map.house1-left-down-corner{
+
+	background-position: 0px 1056px;
+
+}
+
+.map.house1-middle-down-corner{
+
+	background-position: -16px 1056px;
+
+}
+
+.map.house1-right-down-corner{
+
+	background-position: -32px 1056px;
+
+}
+
+.map.house1-left-wall-corner{
+
+	background-position: 0px 1040px;
+
+}
+
+.map.house1-middle-wall-corner{
+
+	background-position: -16px 1040px;
+
+}
+
+.map.house1-right-wall-corner{
+
+	background-position: -32px 1040px;
+
+}
