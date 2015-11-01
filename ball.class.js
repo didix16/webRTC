@@ -287,6 +287,25 @@ Ball.prototype.collisionWithBall = function(oBall){
 	return (this.calcDistance(oBall) <= (radius+radius2));
 };
 
+//Calc the collision with an other ball
+Ball.prototype.calcCollisionWithObject = function(oBall){
+
+	var vectSpeed1 = {x:0,y:0};
+	var vectSpeed2 = {x:0,y:0};
+
+	vectSpeed1.x = this.getVectorialSpeed().x;
+	vectSpeed1.y = this.getVectorialSpeed().y;
+
+	vectSpeed2.x = oBall.getVectorialSpeed().x;
+	vectSpeed2.y = oBall.getVectorialSpeed().y;
+
+	var speed1 = Math.sqrt(this.getSpeed().x*this.getSpeed().x + this.getSpeed().y*this.getSpeed().y);
+	var speed2 = Math.sqrt(oBall.getSpeed().x*oBall.getSpeed().x + oBall.getSpeed().y*oBall.getSpeed().y);
+
+	var newBeta = Math.asin(speed2/speed1);
+	return this;
+};
+
 //Add the ball to the DOM Tree
 //Optional parameter: eContainer = indicates if the ball must be injected to that container.
 //If no parameter, then will be injected to body
@@ -477,6 +496,9 @@ Ball.prototype.move = function(delta){
 		this.setVectorialSpeed(newVectSpeed);
 //			this.speedy = this.speedy / 2;
 	}
+
+	//Collision with other objects test
+
 
 	this.setPosition0(oNewPos);
 
