@@ -5,6 +5,7 @@ var Ball = function(oOptions){
 	var that = this;
 	var vars = {
 
+		id: '', // A random Id generated for the ball
 		position: { // Also this would be the center
 			x: 0,
 			y: 0
@@ -31,6 +32,30 @@ var Ball = function(oOptions){
 		turn: 0, // -1 = left, 0 = forward, 1 = right
 		gas: 0, // -1 = break, 0 = nothing, 1 = throttle
 
+	};
+
+	//Private functions
+	var fns = {
+
+		ball: that,
+		generateRandomId: function(){
+
+			var id = '';
+
+			id = "I_"+Date.now() + that.getPropietary().getName()+ that.getPropietary().getNum();
+			return id;
+		}
+	};
+
+	this.setId = function(id){
+
+		vars.id = id ? id : fns.generateRandomId();
+		return this;
+	};
+
+	this.getId = function(){
+
+		return vars.id;
 	};
 
 	this.setPosition = function(oPos){
@@ -251,6 +276,7 @@ var Ball = function(oOptions){
 		that.setPosition(oOptions.position);
 		//that.setCenter({ x: oOptions.position.x + oOptions.radius, y: oOptions.position.y + oOptions.radius });
 		that.setArea();
+		that.setId();
 
 		return that;
 	};
@@ -284,7 +310,7 @@ Ball.prototype.collisionWithBall = function(oBall){
 
 	var radius = this.getRadius();
 	var radius2 = oBall.getRadius();
-	return (this.calcDistance(oBall) <= (radius+radius2));
+	return (this.calcDistance(oBall,true) <= (radius+radius2));
 };
 
 //Calc the collision with an other ball
@@ -293,8 +319,8 @@ Ball.prototype.calcCollisionWithObject = function(oBall){
 	var vectSpeed1 = {x:0,y:0};
 	var vectSpeed2 = {x:0,y:0};
 
-	vectSpeed1.x = this.getVectorialSpeed().x;
-	vectSpeed1.y = this.getVectorialSpeed().y;
+	vectSpeed1.x = this.getVectorialSpeed().x *0.8;
+	vectSpeed1.y = this.getVectorialSpeed().y *0.8;
 
 	vectSpeed2.x = oBall.getVectorialSpeed().x;
 	vectSpeed2.y = oBall.getVectorialSpeed().y;
@@ -302,9 +328,29 @@ Ball.prototype.calcCollisionWithObject = function(oBall){
 	var speed1 = Math.sqrt(this.getSpeed().x*this.getSpeed().x + this.getSpeed().y*this.getSpeed().y);
 	var speed2 = Math.sqrt(oBall.getSpeed().x*oBall.getSpeed().x + oBall.getSpeed().y*oBall.getSpeed().y);
 
-	var newBeta = Math.asin(speed2/speed1);
+	var newAlpha = Math.asin(speed2/speed1) * 180/Math.PI;
+
+	vectSpeed2.x += vectSpeed1.x;
+	vectSpeed2.y += vectSpeed1.y;
+
+	oBall.setVectorialSpeed(vectSpeed2);
+	this.setVectorialSpeed(vectSpeed1);
+	//oBall.setAlpha(newAlpha);
+
 	return this;
 };
+
+/* Makes the ball more smaller */
+Ball.prototype.shrink = function(radiusToShrik){
+
+	$bSt = this.getElement().style;
+	this.setRadius(this.getRadius()-radiusToShrik);
+
+	$bSt.width = (this.getRadius() * 2)+'px';
+	$bSt.height = (this.getRadius() * 2)+'px';
+
+	return this;
+}
 
 //Add the ball to the DOM Tree
 //Optional parameter: eContainer = indicates if the ball must be injected to that container.
@@ -390,8 +436,9 @@ Ball.prototype.draw = function(){
 	return this;
 }
 
-//Move the ball throught time
-Ball.prototype.move = function(delta){
+//Move the ball throught time.
+//As a second param, receives an array of balls to check collisions
+Ball.prototype.move = function(delta,aoBalls){
 
 	var that = this;
 
@@ -484,7 +531,7 @@ Ball.prototype.move = function(delta){
 	//Bounds hit-test Y
 	if((currPos.y) < currRadius){
 
-		oNewPos.y = currPos.y;
+		oNewPos.y = currRadius;
 
 		newVectSpeed.y = -newVectSpeed.y;
 		this.setVectorialSpeed(newVectSpeed);
@@ -498,6 +545,19 @@ Ball.prototype.move = function(delta){
 	}
 
 	//Collision with other objects test
+	var bLen = aoBalls.length;
+	for (var i = 0; i < aoBalls.length; i++) {
+
+		var ball = aoBalls[i];
+		//Check if collision with other balls
+		if( ball && this.getId() != ball.getId() ){
+			if(this.collisionWithBall(ball)){
+				console.log("COLLISION!");
+				this.calcCollisionWithObject(ball);
+			}
+		}
+		
+	}
 
 
 	this.setPosition0(oNewPos);

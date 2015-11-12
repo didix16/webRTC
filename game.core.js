@@ -51,6 +51,7 @@ _w.game = {
 
 			var ball = game.balls[obj.player.num];
 
+			console.log("BTN_A",obj);
 			if(obj.pressed && !ball.getGas()){
 				ball.setGas(1);
 			}else if(!obj.pressed && ball.getGas()){
@@ -146,9 +147,13 @@ _w.game = {
 
 		var that = this;
 		var bLen = that.balls.length;
-		for(var i = 0;i<bLen;i++){
 
-			that.balls[i].move(this.delta).draw();
+		
+		for(var i=0;i<bLen;i++){
+			if(that.balls[i]){
+				that.balls[i].move(this.delta,that.balls).draw();
+			}
+
 		}
 	},
 
